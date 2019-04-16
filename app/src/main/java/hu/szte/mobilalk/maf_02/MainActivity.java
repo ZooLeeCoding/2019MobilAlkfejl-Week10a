@@ -145,7 +145,8 @@ public class MainActivity extends AppCompatActivity
         JobInfo.Builder jobBuilder = new JobInfo.Builder(0, serviceName)
                 .setRequiredNetworkType(selectedNetworkOption)
                 .setRequiresCharging(true)
-                .setMinimumLatency(2000);
+                .setTriggerContentMaxDelay(5000);
+                //.setMinimumLatency(2000);
 
         JobInfo jobInfo = jobBuilder.build();
         mScheduler.schedule(jobInfo);
