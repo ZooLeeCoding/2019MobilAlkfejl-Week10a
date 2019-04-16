@@ -12,10 +12,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service
+            android:name=".MyJobService"
+            android:enabled="true"
+            android:exported="true"></service>
+
         <receiver
             android:name=".MySyncReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
         <receiver
             android:name=".MyReceiver"
             android:enabled="true"
