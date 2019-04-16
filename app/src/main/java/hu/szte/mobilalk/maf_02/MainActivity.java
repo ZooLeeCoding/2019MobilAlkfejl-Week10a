@@ -4,7 +4,10 @@ import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -40,6 +43,7 @@ public class MainActivity extends AppCompatActivity
     private BroadcastReceiver br;
     private AlarmManager mAlarmManager;
     private PendingIntent alarmPendingIntent;
+    private JobScheduler mScheduler;
 
     public static final String EXTRA_MESSAGE = "hu.szte.mobilalk.maf_02.MESSAGE";
     public static final int TEXT_REQUEST = 1;
@@ -75,11 +79,22 @@ public class MainActivity extends AppCompatActivity
 
         this.mAlarmManager =
                 (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+
+        this.mScheduler = (JobScheduler)this.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+
+        /*
+         * if(mScheduler != null) {
+         *  mScheduler.cancelAll();
+         *  mScheduler = null;
+         * }
+        */
+
     }
 
     @Override
     protected void onDestroy() {
         unregisterReceiver(this.br);
+
         super.onDestroy();
     }
 
@@ -111,11 +126,30 @@ public class MainActivity extends AppCompatActivity
             case R.id.item_cancel_alarm:
                 cancelAlarms();
                 break;
+            case R.id.item_jobs:
+                scheduleJobs();
+                break;
             default:
                 Toast.makeText(this, "invalid selection", Toast.LENGTH_SHORT)
                         .show();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void scheduleJobs() {
+        int selectedNetworkOption = JobInfo.NETWORK_TYPE_ANY;
+
+        ComponentName serviceName = new ComponentName(getPackageName(),
+                MyJobService.class.getName());
+
+        JobInfo.Builder jobBuilder = new JobInfo.Builder(0, serviceName)
+                .setRequiredNetworkType(selectedNetworkOption)
+                .setRequiresCharging(true)
+                .setMinimumLatency(2000);
+
+        JobInfo jobInfo = jobBuilder.build();
+        mScheduler.schedule(jobInfo);
+        Toast.makeText(this, "Job scheduled", Toast.LENGTH_SHORT).show();
     }
 
     public void setAlarm() {
